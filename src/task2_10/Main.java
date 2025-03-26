@@ -3,18 +3,22 @@ package task2_10;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) {
-        String filePath = "C:\\Users\\julia\\Desktop\\Stepik\\src\\task2_10\\input.txt";
-        String input = readInputFromFile(filePath);
+        String inputFilePath = "C:\\Users\\julia\\Desktop\\Stepik\\src\\task2_10\\input.txt";
+        String outputFilePath = "C:\\Users\\julia\\Desktop\\Stepik\\src\\task2_10\\output.txt";
 
+        String input = readInputFromFile(inputFilePath);
         if (input == null) {
-            System.out.println("Error! Cannot read input file");
+            writeOutputToFile(outputFilePath, "Error! Cannot read input file");
             return;
         }
 
-        processExpression(input);
+        String result = processExpression(input);
+        writeOutputToFile(outputFilePath, result);
     }
 
     private static String readInputFromFile(String filePath) {
@@ -23,17 +27,16 @@ public class Main {
                 return fileScanner.nextLine().trim();
             }
         } catch (FileNotFoundException e) {
-            System.out.println("Error! File not found at: " + filePath);
+            return "Error! File not found at: " + filePath;
         }
         return null;
     }
 
-    private static void processExpression(String input) {
+    private static String processExpression(String input) {
         String[] parts = input.split("\\s+");
 
         if (parts.length != 3) {
-            System.out.println("Error! Invalid input format");
-            return;
+            return "Error! Invalid input format";
         }
 
         String num1Str = parts[0];
@@ -46,29 +49,32 @@ public class Main {
             num1 = Double.parseDouble(num1Str);
             num2 = Double.parseDouble(num2Str);
         } catch (NumberFormatException e) {
-            System.out.println("Error! Not number");
-            return;
+            return "Error! Not number";
         }
 
         switch (operator) {
             case "+":
-                System.out.println(String.format("%.1f", num1 + num2));
-                break;
+                return String.format("%.1f", num1 + num2);
             case "-":
-                System.out.println(String.format("%.1f", num1 - num2));
-                break;
+                return String.format("%.1f", num1 - num2);
             case "*":
-                System.out.println(String.format("%.1f", num1 * num2));
-                break;
+                return String.format("%.1f", num1 * num2);
             case "/":
                 if (num2 == 0) {
-                    System.out.println("Error! Division by zero");
+                    return "Error! Division by zero";
                 } else {
-                    System.out.println(String.format("%.1f", num1 / num2));
+                    return String.format("%.1f", num1 / num2);
                 }
-                break;
             default:
-                System.out.println("Operation Error!");
+                return "Operation Error!";
+        }
+    }
+
+    private static void writeOutputToFile(String filePath, String content) {
+        try (FileWriter writer = new FileWriter(filePath)) {
+            writer.write(content);
+        } catch (IOException e) {
+            System.out.println("Error! Unable to write to file: " + filePath);
         }
     }
 }
