@@ -1,35 +1,33 @@
 package task2_10;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.util.Scanner;
-import java.io.FileWriter;
-import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) {
         String inputFilePath = "C:\\Users\\julia\\Desktop\\Stepik\\src\\task2_10\\input.txt";
         String outputFilePath = "C:\\Users\\julia\\Desktop\\Stepik\\src\\task2_10\\output.txt";
 
-        String input = readInputFromFile(inputFilePath);
-        if (input == null) {
-            writeOutputToFile(outputFilePath, "Error! Cannot read input file");
-            return;
-        }
-
-        String result = processExpression(input);
-        writeOutputToFile(outputFilePath, result);
+        processFile(inputFilePath, outputFilePath);
     }
 
-    private static String readInputFromFile(String filePath) {
-        try (Scanner fileScanner = new Scanner(new File(filePath))) {
-            if (fileScanner.hasNextLine()) {
-                return fileScanner.nextLine().trim();
+    private static void processFile(String inputFilePath, String outputFilePath) {
+        try (Scanner fileScanner = new Scanner(new File(inputFilePath));
+             FileWriter writer = new FileWriter(outputFilePath)) {
+
+            while (fileScanner.hasNextLine()) {
+                String line = fileScanner.nextLine().trim();
+                if (line.isEmpty()) continue; // Пропускаем пустые строки
+
+                String result = processExpression(line);
+                writer.write(line + " = " + result + "\n");
             }
+
         } catch (FileNotFoundException e) {
-            return "Error! File not found at: " + filePath;
+            System.out.println("Error! File not found: " + inputFilePath);
+        } catch (IOException e) {
+            System.out.println("Error! Unable to write to file: " + outputFilePath);
         }
-        return null;
     }
 
     private static String processExpression(String input) {
@@ -67,14 +65,6 @@ public class Main {
                 }
             default:
                 return "Operation Error!";
-        }
-    }
-
-    private static void writeOutputToFile(String filePath, String content) {
-        try (FileWriter writer = new FileWriter(filePath)) {
-            writer.write(content);
-        } catch (IOException e) {
-            System.out.println("Error! Unable to write to file: " + filePath);
         }
     }
 }
