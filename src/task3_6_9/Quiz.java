@@ -1,7 +1,9 @@
-package task3_6_9;
+package gui3_6_9;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 class Quiz {
     private static JFrame frame;
