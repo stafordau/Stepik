@@ -6,7 +6,7 @@ import java.awt.*;
 class Spinner {
     public static void main(String[] args) {
         JFrame frame = new JFrame("Книги, Цвет и Время года");
-        frame.setSize(450, 500);
+        frame.setSize(500, 700);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);
         frame.setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS));
@@ -81,6 +81,25 @@ class Spinner {
         answerLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         frame.add(answerLabel);
 
+        frame.add(Box.createRigidArea(new Dimension(0, 20)));
+        JTextField inputField = new JTextField();
+        inputField.setMaximumSize(new Dimension(300, 30));
+        inputField.setAlignmentX(Component.CENTER_ALIGNMENT);
+        frame.add(inputField);
+
+        frame.add(Box.createRigidArea(new Dimension(0, 10)));
+        JButton writeButton = new JButton("Записать");
+        writeButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        frame.add(writeButton);
+
+        frame.add(Box.createRigidArea(new Dimension(0, 10)));
+        JTextArea textArea = new JTextArea();
+        textArea.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        scrollPane.setPreferredSize(new Dimension(400, 150));
+        scrollPane.setAlignmentX(Component.CENTER_ALIGNMENT);
+        frame.add(scrollPane);
+
         button.addActionListener(e -> {
             int books = (int) spinner.getValue();
             String color;
@@ -99,6 +118,14 @@ class Spinner {
             else if (winter.isSelected()) season = "Зима";
 
             answerLabel.setText("Ответ: " + books + " книг, цвет: " + color + ", сезон: " + season);
+        });
+
+        writeButton.addActionListener(e -> {
+            String input = inputField.getText().trim();
+            if (!input.isEmpty()) {
+                textArea.append(input + "\n");
+                inputField.setText("");
+            }
         });
 
         frame.setVisible(true);
