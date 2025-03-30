@@ -15,7 +15,13 @@ public class bd {
             update_type(conn, 1, "Абиссинская кошка (обновлено)");
             delete_type(conn, 2);
 
-            System.out.println("Готово!");
+            System.out.println("\nget_type(1): " + get_type(conn, 1));
+            System.out.println("\nget_type_where(\"id < 5\"):");
+            get_type_where(conn, "id < 5");
+
+            System.out.println("\nВсе породы котиков:");
+            get_all_types(conn);
+
         } catch (Exception e) {
             System.out.println("Ошибка: " + e.getMessage());
         }
@@ -98,5 +104,35 @@ public class bd {
                 System.out.println("Тип с id = " + id + " не найден.");
             }
         }
+    }
+
+    public static String get_type(Connection conn, int id) throws SQLException {
+        String sql = "SELECT type FROM types WHERE id = ?";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, id);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("type");
+                } else {
+                    return "Тип с id = " + id + " не найден.";
+                }
+            }
+        }
+    }
+
+    public static void get_type_where(Connection conn, String where) throws SQLException {
+        String sql = "SELECT id, type FROM types WHERE " + where;
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String type = rs.getString("type");
+                System.out.println(id + ": " + type);
+            }
+        }
+    }
+
+    public static void get_all_types(Connection conn) throws SQLException {
+        get_type_where(conn, "1 = 1");
     }
 }
