@@ -1,9 +1,9 @@
-package gui3_7_2;
+package task3_7_2;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
-import net.miginfocom.swing.*;
+import net.miginfocom.swing.MigLayout;
 
 public class TextEditor extends JFrame {
     public TextEditor() {
@@ -85,7 +85,7 @@ public class TextEditor extends JFrame {
             JOptionPane.showMessageDialog(this, "Ошибка при сохранении файла", "Ошибка", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
+
     private JButton openButton;
     private JLabel label1;
     private JButton saveButton;
