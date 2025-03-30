@@ -2,6 +2,7 @@ package task3_10_1;
 
 import java.sql.*;
 import java.io.*;
+import java.util.ArrayList;
 
 public class bd {
     public static void main(String[] args) {
@@ -28,7 +29,7 @@ public class bd {
             insert_cat(conn, "Мурка", "Сибирская кошка", 3, 5.1);
             insert_cat(conn, "Снежок", "Футуристическая лысая", 1, 3.2);
 
-
+            add_more_cats(conn, 5000);
         } catch (Exception e) {
             System.out.println("Ошибка: " + e.getMessage());
         }
@@ -194,4 +195,45 @@ public class bd {
         }
     }
 
+    public static void add_more_cats(Connection conn, int n) throws SQLException, IOException {
+        String[] names = read_names_from_file("src/task3_10_1/names.txt");
+        String[] types = load_types_from_db(conn);
+
+        for (int i = 0; i < n; i++) {
+            String name = names[(int)(Math.random() * names.length)];
+            String type = types[(int)(Math.random() * types.length)];
+            int age = 1 + (int)(Math.random() * 20);
+            double weight = 2 + Math.random() * 6;
+            insert_cat(conn, name, type, age, weight);
+        }
+    }
+
+    private static String[] read_names_from_file(String fileName) throws IOException {
+        BufferedReader br = new BufferedReader(new FileReader(fileName));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = br.readLine()) != null) {
+            sb.append(line.trim());
+        }
+        br.close();
+        String content = sb.toString();
+        int start = content.indexOf('{');
+        int end = content.lastIndexOf('}');
+        if (start == -1 || end == -1) return new String[0];
+        String[] names = content.substring(start + 1, end).split(",");
+        for (int i = 0; i < names.length; i++) {
+            names[i] = names[i].trim().replaceAll("^\"|\"$", "");
+        }
+        return names;
+    }
+
+    private static String[] load_types_from_db(Connection conn) throws SQLException {
+        Statement stmt = conn.createStatement();
+        ResultSet rs = stmt.executeQuery("SELECT type FROM types");
+        ArrayList<String> list = new ArrayList<>();
+        while (rs.next()) {
+            list.add(rs.getString("type"));
+        }
+        return list.toArray(new String[0]);
+    }
 }
