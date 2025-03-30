@@ -30,6 +30,11 @@ public class bd {
             insert_cat(conn, "Снежок", "Футуристическая лысая", 1, 3.2);
 
             add_more_cats(conn, 5000);
+
+            delete_cat(conn, 3);
+            delete_cat(conn, "age > 15 AND weight < 4");
+            update_cat(conn, 1, "weight = 5.5, age = 7", "age < 20");
+
         } catch (Exception e) {
             System.out.println("Ошибка: " + e.getMessage());
         }
@@ -236,4 +241,38 @@ public class bd {
         }
         return list.toArray(new String[0]);
     }
+
+    public static void delete_cat(Connection conn, int id) throws SQLException {
+        String sql = "DELETE FROM cats WHERE id = ?";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, id);
+            int affected = pstmt.executeUpdate();
+            if (affected > 0) {
+                System.out.println("Кот с id = " + id + " удалён.");
+            } else {
+                System.out.println("Кот с id = " + id + " не найден.");
+            }
+        }
+    }
+
+    public static void delete_cat(Connection conn, String where) throws SQLException {
+        String sql = "DELETE FROM cats WHERE " + where;
+        try (Statement stmt = conn.createStatement()) {
+            int affected = stmt.executeUpdate(sql);
+            System.out.println("Удалено котиков: " + affected);
+        }
+    }
+
+    public static void update_cat(Connection conn, int id, String set, String where) throws SQLException {
+        String sql = "UPDATE cats SET " + set + " WHERE id = " + id + " AND " + where;
+        try (Statement stmt = conn.createStatement()) {
+            int affected = stmt.executeUpdate(sql);
+            if (affected > 0) {
+                System.out.println("Кот с id = " + id + " обновлён.");
+            } else {
+                System.out.println("Кот с id = " + id + " не найден или условие не выполнено.");
+            }
+        }
+    }
+
 }
