@@ -35,6 +35,16 @@ public class bd {
             delete_cat(conn, "age > 15 AND weight < 4");
             update_cat(conn, 1, "weight = 5.5, age = 7", "age < 20");
 
+            System.out.println("\nget_cat(1):");
+            System.out.println(get_cat(conn, 1));
+
+            System.out.println("\nget_cat_where(\"age < 2 AND weight > 5\"):");
+            get_cat_where(conn, "age < 2 AND weight > 5");
+
+            System.out.println("\nВсе котики:");
+            get_all_cats(conn);
+
+
         } catch (Exception e) {
             System.out.println("Ошибка: " + e.getMessage());
         }
@@ -205,9 +215,9 @@ public class bd {
         String[] types = load_types_from_db(conn);
 
         for (int i = 0; i < n; i++) {
-            String name = names[(int)(Math.random() * names.length)];
-            String type = types[(int)(Math.random() * types.length)];
-            int age = 1 + (int)(Math.random() * 20);
+            String name = names[(int) (Math.random() * names.length)];
+            String type = types[(int) (Math.random() * types.length)];
+            int age = 1 + (int) (Math.random() * 20);
             double weight = 2 + Math.random() * 6;
             insert_cat(conn, name, type, age, weight);
         }
@@ -274,5 +284,53 @@ public class bd {
             }
         }
     }
+
+    public static String get_cat(Connection conn, int id) throws SQLException {
+        String sql = """
+                SELECT cats.id, cats.name, types.type, cats.age, cats.weight
+                FROM cats
+                JOIN types ON cats.type_id = types.id
+                WHERE cats.id = ?
+                """;
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, id);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return format_cat_row(rs);
+                } else {
+                    return "Кот с id = " + id + " не найден.";
+                }
+            }
+        }
+    }
+
+    public static void get_cat_where(Connection conn, String where) throws SQLException {
+        String sql = """
+                SELECT cats.id, cats.name, types.type, cats.age, cats.weight
+                FROM cats
+                JOIN types ON cats.type_id = types.id
+                WHERE """ + " " + where;
+
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                System.out.println(format_cat_row(rs));
+            }
+        }
+    }
+
+    public static void get_all_cats(Connection conn) throws SQLException {
+        get_cat_where(conn, "1 = 1");
+    }
+
+    private static String format_cat_row(ResultSet rs) throws SQLException {
+        int id = rs.getInt("id");
+        String name = rs.getString("name");
+        String type = rs.getString("type");
+        int age = rs.getInt("age");
+        double weight = rs.getDouble("weight");
+        return id + ": " + name + ", " + type + ", возраст: " + age + ", вес: " + weight;
+    }
+
 
 }
