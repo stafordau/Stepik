@@ -9,6 +9,8 @@ public class bd {
 
         try (Connection conn = DriverManager.getConnection(url)) {
             createTable(conn);
+            createCatsTable(conn);
+
             insertInitialTypes(conn);
             insertTypesFromFormattedFile(conn, "src/task3_10_1/types.txt");
 
@@ -32,6 +34,20 @@ public class bd {
                 CREATE TABLE IF NOT EXISTS types (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     type TEXT NOT NULL
+                );
+                """;
+        conn.createStatement().execute(sql);
+    }
+
+    private static void createCatsTable(Connection conn) throws SQLException {
+        String sql = """
+                CREATE TABLE IF NOT EXISTS cats (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name VARCHAR(20) NOT NULL,
+                    type_id INTEGER NOT NULL,
+                    age INTEGER NOT NULL,
+                    weight DOUBLE NOT NULL,
+                    FOREIGN KEY (type_id) REFERENCES types(id)
                 );
                 """;
         conn.createStatement().execute(sql);
