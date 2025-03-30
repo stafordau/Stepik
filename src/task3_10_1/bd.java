@@ -9,7 +9,10 @@ class bd {
         try (Connection conn = DriverManager.getConnection(url)) {
             if (conn != null) {
                 createTypesTable(conn);
-                System.out.println("Создано!");
+                insert_type(conn, "Абиссинская кошка");
+                insert_type(conn, "Австралийский мист");
+                insert_type(conn, "Американская жесткошёрстная");
+                System.out.println("Таблица создана и данные добавлены!");
             }
         } catch (SQLException e) {
             System.out.println("Ошибка: " + e.getMessage());
@@ -26,6 +29,14 @@ class bd {
 
         try (Statement stmt = conn.createStatement()) {
             stmt.execute(sql);
+        }
+    }
+
+    private static void insert_type(Connection conn, String type) throws SQLException {
+        String sql = "INSERT INTO types(type) VALUES (?)";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, type);
+            pstmt.executeUpdate();
         }
     }
 }
