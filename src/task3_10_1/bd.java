@@ -24,6 +24,11 @@ public class bd {
             System.out.println("\nВсе породы котиков:");
             get_all_types(conn);
 
+            insert_cat(conn, "Барсик", "Абиссинская кошка", 2, 4.5);
+            insert_cat(conn, "Мурка", "Сибирская кошка", 3, 5.1);
+            insert_cat(conn, "Снежок", "Футуристическая лысая", 1, 3.2);
+
+
         } catch (Exception e) {
             System.out.println("Ошибка: " + e.getMessage());
         }
@@ -151,4 +156,42 @@ public class bd {
     public static void get_all_types(Connection conn) throws SQLException {
         get_type_where(conn, "1 = 1");
     }
+
+    public static void insert_cat(Connection conn, String name, String type, int age, Double weight) throws SQLException {
+        int typeId = get_or_insert_type(conn, type);
+        String sql = "INSERT INTO cats(name, type_id, age, weight) VALUES (?, ?, ?, ?)";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, name);
+            pstmt.setInt(2, typeId);
+            pstmt.setInt(3, age);
+            pstmt.setDouble(4, weight);
+            pstmt.executeUpdate();
+            System.out.println("Кот \"" + name + "\" добавлен в базу данных.");
+        }
+    }
+
+    private static int get_or_insert_type(Connection conn, String typeName) throws SQLException {
+        String selectSql = "SELECT id FROM types WHERE type = ?";
+        try (PreparedStatement selectStmt = conn.prepareStatement(selectSql)) {
+            selectStmt.setString(1, typeName);
+            ResultSet rs = selectStmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("id");
+            }
+        }
+
+        String insertSql = "INSERT INTO types(type) VALUES (?)";
+        try (PreparedStatement insertStmt = conn.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS)) {
+            insertStmt.setString(1, typeName);
+            insertStmt.executeUpdate();
+            ResultSet keys = insertStmt.getGeneratedKeys();
+            if (keys.next()) {
+                System.out.println("Добавлен новый тип: " + typeName);
+                return keys.getInt(1);
+            } else {
+                throw new SQLException("Ошибка при получении id нового типа.");
+            }
+        }
+    }
+
 }
